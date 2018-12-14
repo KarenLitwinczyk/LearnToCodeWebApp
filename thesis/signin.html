@@ -1,0 +1,73 @@
+<html>
+<head> 
+<meta name ="viewport" content = "width=device-width, initial-scale=1">
+<link rel ="stylesheet" href = "style.css"/> 
+<script src = "https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src = "http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script>
+const API = 'process.php';
+
+jQuery(document).ready(function(){
+    jQuery('form').on('submit', function(e){
+        var jqElm = jQuery(this);
+        jqElm.parents('.section').find('div').html('');
+
+        console.log(removeEmptyParams(jqElm.serialize()));
+        var post = jQuery.post(API, removeEmptyParams(jqElm.serialize()), function(d){
+            console.log(d);
+	    console.log(typeof d);
+            if(typeof d === "object"){
+                jqElm.parents('.section').find('div').html(
+                    JSON.stringify(d, undefined, 2)).addClass('pre');
+            } else {
+                try{
+                    jqElm.parents('.section').find('div').html(
+                        JSON.stringify(JSON.parse(d), undefined, 2)).addClass('pre');
+                } catch(e) {
+                    jqElm.parents('.section').find('div').html(d).removeClass('pre');
+                }
+            }
+        });
+
+        post.fail(function(elm, status, error){
+            jqElm.parents('.section').find('div').html(error).removeClass('pre');
+        });
+
+        e.preventDefault();
+    });
+});
+
+function removeEmptyParams(string){
+    return string.replace(/&{0,1}\w+=(&|$)/g, "$1");
+}
+</script>
+Welcome to Name This Project!
+</head>
+<body>
+	<div class="section"/>
+    <a name="signin"></a>
+    <h2>Sign In</h2>
+    <form>
+    <input type="hidden" name="action" value="signin"/>
+    Username: <input type="text" name="username"/><br/>
+    Password: <input type="text" name="password"/><br/>
+    <input id = "ToHome" type="submit" class = "btn btn-primary"/>
+    </form>
+    <script type="text/javascript">
+        document.getElementById("ToHome").onclick = function(){
+            location.href = "homepage.html";
+        };
+    </script>
+    Server Response:<br/>
+    <div class="server-response"></div>
+    </div>
+    <h2>Don't have an account? Sign up here!</h2>
+    <button id= "Register" class = "btn btn-primary">Register</button>
+    <script type = "text/javascript">
+        document.getElementById("Register").onclick = function(){
+            location.href = "signup.html";
+        };
+    </script>
+
+</body>
+</html>
